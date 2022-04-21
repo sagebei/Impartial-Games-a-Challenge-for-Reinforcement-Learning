@@ -2,10 +2,12 @@ import numpy as np
 from NimEnvironments import NimEnv
 from monte_carlo_tree_search import MCTS
 from model import Nim_Model
+from main import set_seed
+set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 5, 0, 0]
-num_simulation = 1000
+heaps = [0, 2, 2, 0, 0]
+num_simulation = 10000
 
 state = []
 for i, counters in enumerate(heaps):
@@ -18,7 +20,6 @@ for i, counters in enumerate(heaps):
     state.extend(heap)
 
 print(heaps)
-print('root node:', end=' ')
 print(state)
 state = np.array(state, dtype=np.float64)
 
@@ -51,4 +52,13 @@ for i, (action, node) in enumerate(root.children.items()):
             sum_counter += counter
     child_node.append(sum_counter)
     print(child_node, end='  MCTS Prob: ')
-    print(visit_count_distribution[i])
+    print(visit_count_distribution[i], end='  Q value: ')
+    print(node.value())
+
+node = root
+_, value = model.predict(node.state)
+print(f'root node:{heaps} ', end='V:')
+print(value, end='')
+print(end='  Q value: ')
+print(node.value())
+
