@@ -6,7 +6,7 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [0, 2, 2, 0, 0]
+heaps = [1, 3, 3, 0, 0]
 num_simulation = 10000
 
 state = []
@@ -19,8 +19,8 @@ for i, counters in enumerate(heaps):
         heap.append(-1)
     state.extend(heap)
 
-print(heaps)
-print(state)
+# print(heaps)
+# print(state)
 state = np.array(state, dtype=np.float64)
 
 game = NimEnv(num_piles=len(heaps))
@@ -37,28 +37,25 @@ visit_counts = np.array([child.visit_count for child in root.children.values()])
 visit_count_distribution = visit_counts / sum(visit_counts)
 
 for i, (action, node) in enumerate(root.children.items()):
-    
-    print('P:', end='')
-    print(node.prior, end="  V:")
-    _, value = model.predict(node.state)
-    print(value, end="  Child:")
-    child_node = []
+    child_state = []
     sum_counter = 0
     for counter in list(np.array(node.state, dtype=np.int8)):
         if counter == -1:
-            child_node.append(sum_counter)
+            child_state.append(sum_counter)
             sum_counter = 0
         else:
             sum_counter += counter
-    child_node.append(sum_counter)
-    print(child_node, end='  MCTS Prob: ')
-    print(visit_count_distribution[i], end='  Q value: ')
-    print(node.value())
+    child_state.append(sum_counter)
+    
+    print(f'Child: {child_state}', end='   ')
+    print(f'P:{node.prior}', end="  ")
+    _, value = model.predict(node.state)
+    print(f'V:{value}', end=" ")
+    print(f'N: {node.visit_count}({visit_count_distribution[i]}%)', end='   ')
+    print(f'Q value:{node.value()}')
 
-node = root
-_, value = model.predict(node.state)
-print(f'root node:{heaps} ', end='V:')
-print(value, end='')
-print(end='  Q value: ')
-print(node.value())
+_, value = model.predict(root.state)
+print(f'root:{heaps} ', end='')
+print(f'V:{value}', end=" ")
+print(f'Q value:{root.value()}')
 
