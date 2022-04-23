@@ -20,7 +20,7 @@ if __name__ == '__main__':
     ray.init(ignore_reinit_error=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     set_seed(30)
-    num_workers = 3  # multiprocessing.cpu_count() - 1
+    num_workers = 4  # multiprocessing.cpu_count() - 1
 
     args = {
         'batch_size': 128,
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     trainer.learn()
 
     # save the model after the final update
-    model.save_checkpoint('.', filename=f'{args["piles"]}_final')
+    model.save_checkpoint('./models', filename=f'{args["piles"]}_final')
 
     writer.close()
     ray.shutdown()

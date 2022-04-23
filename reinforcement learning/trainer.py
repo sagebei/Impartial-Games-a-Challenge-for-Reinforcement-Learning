@@ -70,7 +70,6 @@ class Simulation:
                 action = root.select_action(temperature=temp)
                 next_state, reward, done = self.game.step(action)
                 state = next_state
-                reward = -reward
 
                 n_moves += 1
 
@@ -79,7 +78,7 @@ class Simulation:
                     examples = []
                     for history_state, history_action_probs, history_player in train_examples:
                         examples.append((history_state, history_action_probs,
-                                         reward if history_player == self.game.to_play() else -reward))
+                                         -reward if history_player == self.game.to_play() else reward))
                     return examples
 
 
@@ -217,7 +216,7 @@ class Trainer:
             self.epoch_counter += 1
 
             if self.epoch_counter % 100 == 0:
-                self.model.save_checkpoint('.', filename=f'{self.args["piles"]}_{self.epoch_counter}')
+                self.model.save_checkpoint('./models', filename=f'{self.args["piles"]}_{self.epoch_counter}')
 
     def eval_policy_value_acc(self, branching_factor=1, value_threshold=1.0):
         self.model.eval()
