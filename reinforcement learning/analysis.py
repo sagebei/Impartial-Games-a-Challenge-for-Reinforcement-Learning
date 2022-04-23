@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from NimEnvironments import NimEnv
 from monte_carlo_tree_search import MCTS
 from model import Nim_Model
@@ -27,6 +28,7 @@ game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_layers=1)
+model.load_state_dict(torch.load('5_1'))
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,
         'c_puct': 3}

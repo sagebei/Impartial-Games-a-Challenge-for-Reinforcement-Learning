@@ -52,9 +52,7 @@ if __name__ == '__main__':
     trainer.learn()
 
     # save the model after the final update
-    model.save_checkpoint('.', filename='latest_model')
-    # save the model with the highest elo rating
-    trainer.save_best_model()
+    model.save_checkpoint('.', filename=f'{args["piles"]}_final')
 
     writer.close()
     ray.shutdown()

@@ -216,6 +216,9 @@ class Trainer:
             self.writer.add_scalar('Elo_Rating', last_rating, self.epoch_counter)
             self.epoch_counter += 1
 
+            if self.epoch_counter % 100 == 0:
+                self.model.save_checkpoint('.', filename=f'{self.args["piles"]}_{self.epoch_counter}')
+
     def eval_policy_value_acc(self, branching_factor=1, value_threshold=1.0):
         self.model.eval()
         with torch.no_grad():
