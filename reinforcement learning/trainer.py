@@ -84,7 +84,7 @@ class Simulation:
 
 
 class Trainer:
-    def __init__(self, game, model, args, writer, device, num_simulations=4):
+    def __init__(self, game, model, args, writer, device, num_workers=4):
         self.game = game
         self.model = model
         self.args = args
@@ -95,8 +95,8 @@ class Trainer:
         self.schduler_counter = 0
 
         self.ps = ParameterServer.remote(self.model, self.args)
-        self.num_simulations = num_simulations
-        self.simulations = [Simulation.remote(self.game, self.model, self.args, self.ps) for _ in range(self.num_simulations)]
+        self.num_workers = num_workers
+        self.simulations = [Simulation.remote(self.game, self.model, self.args, self.ps) for _ in range(self.num_workers)]
         
         self.elo = Elo(k=16)
         self.player_pool = PlayerPool(self.elo)
@@ -109,9 +109,8 @@ class Trainer:
             print(f'{i}/{self.args["numIters"]}')
             train_examples = []
             
-            for i in range(self.args['numEps'] // self.num_simulations):
+            for i in range(self.args['numEps'] // self.num_workers):
                 examples = ray.get([sim.execute_episode.remote() for sim in self.simulations])
-                print(len(examples))  # should be the same as self.simulations
                 for exp in examples:
                     train_examples.extend(exp)
             shuffle(train_examples)

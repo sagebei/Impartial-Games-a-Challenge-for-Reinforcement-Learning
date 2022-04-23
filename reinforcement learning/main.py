@@ -20,23 +20,24 @@ if __name__ == '__main__':
     ray.init(ignore_reinit_error=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     set_seed(30)
-    num_workers = 8  # multiprocessing.cpu_count() - 1
+    num_workers = 3  # multiprocessing.cpu_count() - 1
 
     args = {
         'batch_size': 128,
         'numIters': 200,
         'num_simulations': 50,  # 70, 100
-        'numEps': 120,
+        'numEps': 100,
         'lr': 0.01,
         'weight_decay': 1e-4,
         'epochs': 3,
         'piles': 5,  # 6, 7
         'hidden_size': 128,
-        'num_layers': 1, # 2
+        'num_layers': 1,  # 2
         'branching_factor': 1,
         'exploration_moves': 3,
         'num_samples': 10000,
         'alpha': 0.35,
+        'epsilon': 0.25,
         'c_puct': 3
     }
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
                       hidden_size=args['hidden_size'],
                       num_layers=args['num_layers'])
 
-    trainer = Trainer(game, model, args, writer, device, num_simulations=num_workers)
+    trainer = Trainer(game, model, args, writer, device, num_workers=num_workers)
     trainer.learn()
 
     # save the model after the final update

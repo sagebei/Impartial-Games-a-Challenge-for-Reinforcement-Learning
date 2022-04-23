@@ -4,9 +4,8 @@ import copy
 
 # The default value for the alpha and epsilon is copied from self-play section of the paper,
 # mastering the game of Go without human knowledge
-def pucb_score(parent, child, c_puct, noise, epsilon):
-    prior = (1.0 - epsilon) * child.prior + epsilon * noise  # add dirichlet noise to the prior probability.
-    prior_score = prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
+def pucb_score(parent, child, c_puct):
+    prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
     if child.visit_count > 0:
         value_score = - child.value()
     else:
@@ -50,16 +49,13 @@ class Node:
         return action
 
     # select
-    def select_child(self, c_puct=3, noise=None, epsilon=0.25):  # opt for the child node that has the highest UCB score among its siblings.
+    def select_child(self, c_puct=3):  # opt for the child node that has the highest UCB score among its siblings.
         best_score = -np.inf
         best_action = -1
         best_child = None
 
         for i, (action, child) in enumerate(self.children.items()):
-            if epsilon == 0.0:
-                score = pucb_score(self, child, c_puct, 0, epsilon)
-            else:
-                score = pucb_score(self, child, c_puct, noise[i], epsilon)
+            score = pucb_score(self, child, c_puct)
             if score > best_score:
                 best_score = score
                 best_action = action
@@ -73,6 +69,12 @@ class Node:
             # Only breed the children corresponding to the legal moves
             if prob != 0.0:
                 self.children[action] = Node(prior=prob, to_play=self.to_play * -1)
+
+    def add_dirichlet_noise(self, alpha, epsilon):
+        actions = list(self.children.keys())
+        noise = np.random.dirichlet([alpha] * len(actions))
+        for a, n in zip(actions, noise):
+            self.children[a].prior = self.children[a].prior * (1 - epsilon) + n * epsilon
 
 
 class MCTS:
@@ -94,17 +96,15 @@ class MCTS:
         action_probs /= np.sum(action_probs)   # re-normalize the probabilities for remaining moves
 
         root.expand(state, to_play, action_probs)  # expand the root node
+        if is_train:
+            root.add_dirichlet_noise(self.args['alpha'], epsilon=self.args['epsilon'])
 
         for _ in range(self.args['num_simulations']):
             node = root
             search_path = [node]  # a list storing all the child nodes encountered during the simulation
-            noise = np.random.dirichlet([self.args['alpha'] for _ in range(len(root.children))])
 
             while node.expanded():  # expand the node if it has not been expanded
-                if node == root and is_train:
-                    action, node = node.select_child(c_puct=self.args['c_puct'], noise=noise, epsilon=0.25)
-                else:
-                    action, node = node.select_child(c_puct=self.args['c_puct'], noise=None, epsilon=0.0)
+                action, node = node.select_child(c_puct=self.args['c_puct'])
                 search_path.append(node)  # add the child node to the traversing list.
 
             parent = search_path[-2]  # the parent node of the leaf node
