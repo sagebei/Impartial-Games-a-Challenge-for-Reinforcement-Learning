@@ -12,7 +12,7 @@ import ray
 import copy
 
 
-@ray.remote(num_gpus=0, num_cpus=1)
+@ray.remote
 class ParameterServer:
     def __init__(self, model, args):
         self.model = copy.deepcopy(model)
@@ -34,7 +34,7 @@ class ParameterServer:
         return self.model.get_weights()
     
 
-@ray.remote(num_gpus=0, num_cpus=1)
+@ray.remote
 class Simulation:
     def __init__(self, game, model, args, ps):
         self.game = copy.deepcopy(game)
