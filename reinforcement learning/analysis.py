@@ -7,8 +7,8 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 3, 0, 0]
-num_simulation = 1000
+heaps = [1, 3, 5, 7, 9]
+num_simulation = 10
 
 state = []
 for i, counters in enumerate(heaps):
@@ -28,8 +28,8 @@ game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_layers=1)
-# model.load_state_dict(torch.load('./models/5_piles_latest_model'))
-model.load_state_dict(torch.load('./models/5_200'))
+model.load_state_dict(torch.load('./models/5_piles_latest_model'))
+# model.load_state_dict(torch.load('./models/5_200'))
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,
         'c_puct': 3}

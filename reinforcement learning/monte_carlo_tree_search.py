@@ -115,7 +115,7 @@ class MCTS:
             next_state, reward, done = self.game.step(action=action)
             # If the action results in winning the game at the next_state, this means that the state at which the action
             # is taken is a losing position. Thus, the value of the state is the opposite of the obtained reward.
-            value = -reward
+            
 
             # If the next_state is not the terminal state, expand the node that represents the next_state
             if not done:
@@ -123,10 +123,12 @@ class MCTS:
                 action_masks = self.game.get_action_masks()
                 action_probs = action_probs_pred * action_masks  # mask out illegal moves
                 action_probs /= np.sum(action_probs)
-                node.expand(next_state, parent.to_play * -1, action_probs)
+                node.expand(next_state, self.game.to_play(), action_probs)
+            else:
+                value = -reward
 
             # update all the nodes at the end of the simulation
-            self.backpropagate(search_path, value, parent.to_play * -1)
+            self.backpropagate(search_path, value, self.game.to_play())
         
         return root
 
