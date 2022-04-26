@@ -7,8 +7,8 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 5, 7, 9]
-num_simulation = 10
+heaps = [1, 2, 5, 7, 9]
+num_simulation = 100000
 
 state = []
 for i, counters in enumerate(heaps):
