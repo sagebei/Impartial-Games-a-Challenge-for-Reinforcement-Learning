@@ -28,7 +28,8 @@ game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_layers=1)
-model.load_state_dict(torch.load('./models/5_piles_latest_model'))
+model.load_state_dict(torch.load('./models/5_piles_latest_model',
+                                 map_location=torch.device('cpu')))
 # model.load_state_dict(torch.load('./models/5_200'))
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,
