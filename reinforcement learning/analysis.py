@@ -6,7 +6,7 @@ from model import Nim_Model
 from main import set_seed
 set_seed(30)
 
-# board size: [1, 3, 5, 7, 9
+# board size: [1, 3, 5, 7, 9]
 heaps = [1, 3, 5, 7, 9, 11]
 num_simulation = 4194304
 
@@ -36,18 +36,10 @@ game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_layers=1)
-<<<<<<< HEAD
 
-
-# model.load_state_dict(torch.load(f'./models/{len(heaps)}_final'))
 model.load_state_dict(torch.load(f'./models/{len(heaps)}_piles_latest_model'))
 # model.load_state_dict(torch.load(f'./models/{len(heaps)}_{100}'))
 
-=======
-model.load_state_dict(torch.load('./models/5_piles_latest_model',
-                                 map_location=torch.device('cpu')))
-# model.load_state_dict(torch.load('./models/5_200'))
->>>>>>> 7f5b32188f67db6822f40daf442d7a7554ec56e6
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,
         'c_puct': 3}
