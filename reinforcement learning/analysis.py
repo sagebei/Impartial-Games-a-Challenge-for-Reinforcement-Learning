@@ -6,9 +6,19 @@ from model import Nim_Model
 from main import set_seed
 set_seed(30)
 
-# board size: [1, 3, 5, 7, 9]
-heaps = [1, 2, 5, 7, 9]
-num_simulation = 100000
+# board size: [1, 3, 5, 7, 9
+heaps = [1, 3, 5, 7, 9, 11]
+num_simulation = 4194304
+
+def win_lose_position(position):
+    xor = 0
+    for c in child_state:
+        xor = c ^ xor
+    if xor == 0:
+        win_lost = 'WIN'
+    else: 
+        win_lost = 'LOSE'
+    return win_lost
 
 state = []
 for i, counters in enumerate(heaps):
@@ -20,17 +30,24 @@ for i, counters in enumerate(heaps):
         heap.append(-1)
     state.extend(heap)
 
-# print(heaps)
-# print(state)
 state = np.array(state, dtype=np.float64)
 
 game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_layers=1)
+<<<<<<< HEAD
+
+
+# model.load_state_dict(torch.load(f'./models/{len(heaps)}_final'))
+model.load_state_dict(torch.load(f'./models/{len(heaps)}_piles_latest_model'))
+# model.load_state_dict(torch.load(f'./models/{len(heaps)}_{100}'))
+
+=======
 model.load_state_dict(torch.load('./models/5_piles_latest_model',
                                  map_location=torch.device('cpu')))
 # model.load_state_dict(torch.load('./models/5_200'))
+>>>>>>> 7f5b32188f67db6822f40daf442d7a7554ec56e6
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,
         'c_puct': 3}
@@ -54,7 +71,7 @@ for i, (action, node) in enumerate(root.children.items()):
                 sum_counter += counter
         child_state.append(sum_counter)
         
-        print(f'Child: {child_state}', end='   ')
+        print(f'Child: {child_state} {win_lose_position(child_state)}', end='   ')
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
         print(f'V:{value}', end=" ")
@@ -62,7 +79,7 @@ for i, (action, node) in enumerate(root.children.items()):
         print(f'Q value:{-node.value()}')
 
 _, value = model.predict(root.state)
-print(f'root:{heaps} ', end='')
+print(f'root:{heaps} {win_lose_position(heaps)} ', end='')
 print(f'V:{value}', end=" ")
-print(f'WL:{root.value()}')
-
+print(f'WL:{0.5 + root.value()/2}%')
+print(num_simulation)
