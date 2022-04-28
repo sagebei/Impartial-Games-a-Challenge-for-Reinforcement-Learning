@@ -15,9 +15,9 @@ def win_lose_position(position):
     for c in child_state:
         xor = c ^ xor
     if xor == 0:
-        win_lost = 'WIN'
-    else: 
         win_lost = 'LOSE'
+    else: 
+        win_lost = 'WIN'
     return win_lost
 
 state = []
@@ -73,5 +73,5 @@ for i, (action, node) in enumerate(root.children.items()):
 _, value = model.predict(root.state)
 print(f'root:{heaps} {win_lose_position(heaps)} ', end='')
 print(f'V:{value}', end=" ")
-print(f'WL:{0.5 + root.value()/2}%')
+print(f'WL:{(0.5 + root.value()/2)*100}%')
 print(num_simulation)
