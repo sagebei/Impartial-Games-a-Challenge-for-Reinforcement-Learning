@@ -7,17 +7,17 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 5, 7, 9, 11]
-num_simulation = 4194304
+heaps = [1, 2, 5, 5, 6, 3]
+num_simulation = 65536
 
 def win_lose_position(position):
     xor = 0
     for c in child_state:
         xor = c ^ xor
     if xor == 0:
-        win_lost = 'LOSE'
-    else: 
         win_lost = 'WIN'
+    else: 
+        win_lost = 'LOSE'
     return win_lost
 
 state = []
@@ -49,6 +49,8 @@ root = mcts.run(state, game.to_play(), is_train=False)
 visit_counts = np.array([child.visit_count for child in root.children.values()])
 visit_count_distribution = visit_counts / sum(visit_counts)
 
+print('All the statistics are draw from the perspective of the player who is taking the move')
+heap_indices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
 for i, (action, node) in enumerate(root.children.items()):
     child_state = []
     sum_counter = 0
@@ -62,13 +64,19 @@ for i, (action, node) in enumerate(root.children.items()):
             else:
                 sum_counter += counter
         child_state.append(sum_counter)
-        
-        print(f'Child: {child_state} {win_lose_position(child_state)}', end='   ')
+
+        for idx, child_heap in enumerate(zip(child_state, heaps)):
+            if child_heap[0] != child_heap[1]:
+                removed_matches = child_heap[1] - child_heap[0]
+                child_move = f'{heap_indices[idx]}{removed_matches}'
+
+        print(f'{child_move}: {child_state} {win_lose_position(child_state)}', end='   ')
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
-        print(f'V:{value}', end=" ")
-        print(f'N: {node.visit_count}({visit_count_distribution[i]}%)', end='   ')
-        print(f'Q value:{-node.value()}')
+        print(f'V:{-value}({(0.5-value/2)*100}%)', end=" ")
+        print(f'N: {node.visit_count}({visit_count_distribution[i]*100}%)', end='   ')
+        print(f'Q value:{-node.value()}', end='   ')
+        print(f'WL:{0.5-node.value()/2}')
 
 _, value = model.predict(root.state)
 print(f'root:{heaps} {win_lose_position(heaps)} ', end='')
