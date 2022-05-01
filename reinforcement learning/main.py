@@ -44,7 +44,7 @@ if __name__ == '__main__':
         'calculate_elo': False
     }
 
-    writer = SummaryWriter("_".join(str(p) for p in args.values()))
+    writer = SummaryWriter("_".join(str(p) if not isinstance(p, list) else "m".join(str(i) for i in p) for p in args.values()))
 
     game = NimEnv(num_piles=args['piles'])
     model = Nim_Model(action_size=game.action_size,
