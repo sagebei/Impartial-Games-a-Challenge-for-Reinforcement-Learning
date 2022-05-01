@@ -26,13 +26,13 @@ if __name__ == '__main__':
         'piles': 5,  # 6, 7
         'num_simulations': 50,  # 70, 100
         'batch_size': 128,
-        'numIters': 200,
         'numEps': 105,
-        'lr': 0.01,
-        'scheduler_step_size': 200,
+        'numIters': 200,
+        'epochs': 3,
+        'lr': 0.02,
+        'milestones': [200, 400],
         'scheduler_gamma': 0.1,
         'weight_decay': 1e-4,
-        'epochs': 3,
         'hidden_size': 128,
         'num_layers': 1,  # 2
         'branching_factor': 1,

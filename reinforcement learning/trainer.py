@@ -2,7 +2,7 @@ import numpy as np
 from random import shuffle
 import torch
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import MultiStepLR
 from NimEnvironments import NimEnv
 from monte_carlo_tree_search import MCTS
 from EloRating import Elo
@@ -85,9 +85,9 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(),
                                     lr=args['lr'],
                                     weight_decay=args['weight_decay'])
-        self.scheduler = StepLR(self.optimizer,
-                                step_size=args['scheduler_step_size'],
-                                gamma=args['scheduler_gamma'])
+        self.scheduler = MultiStepLR(self.optimizer,
+                                     milestones=args['milestones'],
+                                     gamma=args['scheduler_gamma'])
 
         self.ps = ParameterServer.remote(self.model.get_weights())
         self.num_workers = num_workers
