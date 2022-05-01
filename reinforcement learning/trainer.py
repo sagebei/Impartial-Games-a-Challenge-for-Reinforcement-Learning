@@ -14,25 +14,15 @@ import copy
 
 @ray.remote
 class ParameterServer:
-    def __init__(self, model, args):
-        self.model = copy.deepcopy(model)
-        self.optimizer = optim.Adam(self.model.parameters(),
-                                    lr=args['lr'],
-                                    weight_decay=args['weight_decay'])
-        self.scheduler = StepLR(self.optimizer,
-                                step_size=int((args['numIters']*args['epochs'])/3),
-                                gamma=0.1)
+    def __init__(self, parameters):
+        self.parameters = parameters
     
-    def apply_graident(self, gradients, use_scheduler=False):
-        self.optimizer.zero_grad()
-        self.model.set_gradients(gradients)
-        self.optimizer.step()
-        if use_scheduler:
-            self.scheduler.step()
+    def get_parameters(self):
+        return self.parameters
+    
+    def set_parameters(self, parameters):
+        self.parameters = parameters
         
-    def get_weights(self):
-        return self.model.get_weights()
-    
 
 @ray.remote
 class Simulation:
@@ -43,7 +33,7 @@ class Simulation:
         self.ps = ps
 
     def execute_episode(self):
-        current_weight = ray.get(self.ps.get_weights.remote())
+        current_weight = ray.get(self.ps.get_parameters.remote())
         self.model.set_weights(current_weight)
         mcts = MCTS(self.game, self.model, self.args)
         train_examples = []
@@ -91,9 +81,15 @@ class Trainer:
         self.device = device
         self.batch_counter = 0  # record the number of batch data used during the training process
         self.epoch_counter = 0  # record the number of training epochs
-        self.schduler_counter = 0
 
-        self.ps = ParameterServer.remote(self.model, self.args)
+        self.optimizer = optim.Adam(self.model.parameters(),
+                                    lr=args['lr'],
+                                    weight_decay=args['weight_decay'])
+        self.scheduler = StepLR(self.optimizer,
+                                step_size=args['scheduler_step_size'],
+                                gamma=args['scheduler_gamma'])
+
+        self.ps = ParameterServer.remote(self.model.get_weights())
         self.num_workers = num_workers
         self.simulations = [Simulation.remote(self.game, self.model, self.args, self.ps) for _ in range(self.num_workers)]
         
@@ -163,11 +159,9 @@ class Trainer:
                     self.player_pool.update_elo_rating(latest_player_id, opponent_id)
 
     def train(self, examples):
-        for n_epochs in range(self.args['epochs']):
+        for _ in range(self.args['epochs']):
             batch_idx = 0
             while batch_idx < len(examples) // self.args['batch_size']:
-                current_weight = ray.get(self.ps.get_weights.remote())
-                self.model.set_weights(current_weight)
                 self.model.to(self.device)
                 self.model.train()
 
@@ -186,18 +180,17 @@ class Trainer:
                 
                 self.writer.add_scalar('Pi_Loss', l_pi, self.batch_counter)
                 self.writer.add_scalar('V_Loss', l_v, self.batch_counter)
-
-                self.batch_counter += 1
                 
                 self.model.zero_grad()
                 total_loss.backward()
-                if n_epochs == self.schduler_counter:
-                    self.ps.apply_graident.remote(self.model.get_gradients(), use_scheduler=True)
-                    self.schduler_counter += 1
-                else: 
-                    self.ps.apply_graident.remote(self.model.get_gradients(), use_scheduler=False)
+                self.optimizer.step()
+                
+                self.batch_counter += 1
                 batch_idx += 1
-
+                
+            self.scheduler.step()
+            self.ps.set_parameters.remote(self.model.get_weights())
+            
             # Factor
             for bf in range(1, self.args['branching_factor']+1):
                 random_policy_acc, policy_acc, value_acc = self.eval_policy_value_acc(branching_factor=bf)
@@ -208,11 +201,13 @@ class Trainer:
                     self.writer.add_scalar(f'Value_Accuracy', value_acc, self.epoch_counter)
 
             # Elo rating
-            self.player_pool.add_player(self.model)
-            for _ in range(1):
-                self.elo_rating_update()
-            last_rating = self.player_pool.get_latest_player_rating()
-            self.writer.add_scalar('Elo_Rating', last_rating, self.epoch_counter)
+            if self.args['calculate_elo']:
+                self.player_pool.add_player(self.model)
+                for _ in range(1):
+                    self.elo_rating_update()
+                last_rating = self.player_pool.get_latest_player_rating()
+                self.writer.add_scalar('Elo_Rating', last_rating, self.epoch_counter)
+                
             self.epoch_counter += 1
 
             if self.epoch_counter % 100 == 0:
@@ -228,8 +223,7 @@ class Trainer:
             v_acc = 0
             v_total = 0
             for state, policies_target, value_target, mask in zip(self.state_space, self.policy_space, self.value_space, self.masks):
-                probs, value = self.model(torch.tensor(state, dtype=torch.float32, device=self.device))
-                probs = probs.data.cpu().numpy()
+                probs, value = self.model.predict(np.array(state))
                 probs = probs * np.array(mask)
                 random_probs = np.random.rand(len(probs)) * np.array(mask)
                 # if this state has at least one winning move
@@ -265,7 +259,7 @@ class Trainer:
 
     # calculate the loss for the value network
     def loss_v(self, targets, outputs):
-        loss = torch.sum((targets - outputs.squeeze()) ** 2) / targets.size()[0]
+        loss = torch.mean((targets - outputs.squeeze()) ** 2)
         return loss
             
             
