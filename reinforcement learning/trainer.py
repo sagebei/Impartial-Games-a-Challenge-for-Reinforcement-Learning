@@ -209,7 +209,6 @@ class Trainer:
                 self.writer.add_scalar('Elo_Rating', last_rating, self.epoch_counter)
                 
             self.epoch_counter += 1
-
             if self.epoch_counter % 100 == 0:
                 self.model.save_checkpoint('./models', filename=f'{self.args["piles"]}_{self.epoch_counter}')
 

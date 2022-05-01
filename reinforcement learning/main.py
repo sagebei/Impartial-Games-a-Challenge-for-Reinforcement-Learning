@@ -44,7 +44,7 @@ if __name__ == '__main__':
         'calculate_elo': False
     }
 
-    writer = SummaryWriter(f'logs/{args["piles"]}_{args["alpha"]}_{args["c_puct"]}_{args["num_layers"]}_{args["numIters"]}_{args["num_simulations"]}_{args["numEps"]}')
+    writer = SummaryWriter(f'logs/{args["piles"]}_{args["num_simulations"]}_{args["numEps"]}_{args["alpha"]}_{args["c_puct"]}_{args["num_layers"]}_{args["numIters"]}_{args["batch_size"]}')
 
     game = NimEnv(num_piles=args['piles'])
     model = Nim_Model(action_size=game.action_size,

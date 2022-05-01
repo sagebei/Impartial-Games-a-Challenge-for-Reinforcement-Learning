@@ -6,7 +6,7 @@
 #$ -l h_vmem=7.5G   # Request RAM (7.5GB per core)
 #$ -l h_rt=240:0:0    # Max 1hr runtime (can request up to 240hr)
 #$ -l gpu=1         # Request GPU
-#$ -N alphazero_5piles      # Name for the job (optional)
+#$ -N heaps5     # Name for the job (optional)
 
 # Load the necessary modules
 export OMP_NUM_THREADS=1
