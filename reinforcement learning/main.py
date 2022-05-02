@@ -27,8 +27,8 @@ if __name__ == '__main__':
         'num_simulations': 50,  # 70, 100
         'batch_size': 128,
         'numEps': 104,
-        'numIters': 300,
-        'epochs': 3,
+        'numIters': 900,
+        'epochs': 1,
         'lr': 0.02,
         'milestones': [200, 500],
         'scheduler_gamma': 0.1,

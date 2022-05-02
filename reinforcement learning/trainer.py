@@ -20,6 +20,7 @@ class Simulation:
 
     def execute_episode(self, model):
         self.model = model
+        self.model.to(torch.device('cpu'))
         mcts = MCTS(self.game, self.model, self.args)
         train_examples = []
         
