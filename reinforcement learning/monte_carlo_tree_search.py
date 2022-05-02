@@ -4,17 +4,17 @@ import copy
 
 # The default value for the alpha and epsilon is copied from self-play section of the paper,
 # mastering the game of Go without human knowledge
-def pucb_score(parent, child, c_puct):
-    if parent.visit_count > 0:
-        prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
-    else:
-        prior_score = child.prior
+def pucb_score(parent, child, c1=1.25, c2=19652):
+    
+    pb_c = c1 + math.log((parent.visit_count + c2 + 1) / c2)
+    pb_c *= math.sqrt(parent.visit_count) / (child.visit_count + 1)
+    prior_score = pb_c * child.prior
 
     if child.visit_count > 0:
         value_score = - child.value()
     else:
         value_score = 0
-    return value_score + c_puct * prior_score
+    return value_score + prior_score
 
 
 class Node:
@@ -53,13 +53,13 @@ class Node:
         return action
 
     # select
-    def select_child(self, c_puct=3):  # opt for the child node that has the highest UCB score among its siblings.
+    def select_child(self):  # opt for the child node that has the highest UCB score among its siblings.
         best_score = -np.inf
         best_action = -1
         best_child = None
 
         for i, (action, child) in enumerate(self.children.items()):
-            score = pucb_score(self, child, c_puct)
+            score = pucb_score(self, child)
             if score > best_score:
                 best_score = score
                 best_action = action
@@ -108,7 +108,7 @@ class MCTS:
             search_path = [node]  # a list storing all the child nodes encountered during the simulation
 
             while node.expanded():  # expand the node if it has not been expanded
-                action, node = node.select_child(c_puct=self.args['c_puct'])
+                action, node = node.select_child()
                 search_path.append(node)  # add the child node to the traversing list.
 
             parent = search_path[-2]  # the parent node of the leaf node

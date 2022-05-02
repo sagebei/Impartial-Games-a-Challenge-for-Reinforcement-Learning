@@ -40,7 +40,6 @@ if __name__ == '__main__':
         'num_samples': 10000,
         'alpha': 0.35,
         'epsilon': 0.25,
-        'c_puct': 3,
         'calculate_elo': False
     }
 
