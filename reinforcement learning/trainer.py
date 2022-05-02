@@ -88,6 +88,7 @@ class Trainer:
             print(f'{i}/{self.args["numIters"]}')
             train_examples = []
             self.model.to(torch.device('cpu'))
+            self.model.eval()
             for i in range(self.args['numEps'] // self.num_workers):
                 examples = ray.get([sim.execute_episode.remote(self.model) for sim in self.simulations])
                 for exp in examples:
