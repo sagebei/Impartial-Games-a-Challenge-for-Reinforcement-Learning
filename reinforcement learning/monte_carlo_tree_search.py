@@ -4,13 +4,17 @@ import copy
 
 # The default value for the alpha and epsilon is copied from self-play section of the paper,
 # mastering the game of Go without human knowledge
-def pucb_score(parent, child, c_puct):
-    prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
+def pucb_score(parent, child, c1=1.25, c2=19652):
+    # prior_score = child.prior * math.sqrt(parent.visit_count) / (child.visit_count + 1)
+    pb_c = c1 + math.log((parent.visit_count + c2 + 1) / c2)
+    pb_c *= math.sqrt(parent.visit_count) / (child.visit_count + 1)
+    prior_score = pb_c * child.prior
+
     if child.visit_count > 0:
         value_score = - child.value()
     else:
         value_score = 0
-    return value_score + c_puct * prior_score
+    return prior_score + value_score
 
 
 class Node:
