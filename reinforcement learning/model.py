@@ -43,7 +43,7 @@ class Nim_Model(nn.Module):
         if len(state.shape) != 1:
             raise Exception('predict function only processes individual state')
         
-        device = next(self.lstm.parameters()).device
+        device = next(self.policy_lstm.parameters()).device
         state = torch.FloatTensor(state.astype(np.float32)).to(device)
         state = torch.unsqueeze(state, dim=0)
         
