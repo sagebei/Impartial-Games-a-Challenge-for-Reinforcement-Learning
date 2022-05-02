@@ -20,7 +20,6 @@ class Simulation:
 
     def execute_episode(self, model):
         self.model = model
-        self.model.to(torch.device('cpu'))
         mcts = MCTS(self.game, self.model, self.args)
         train_examples = []
         
@@ -88,7 +87,7 @@ class Trainer:
         for i in range(1, self.args['numIters'] + 1):
             print(f'{i}/{self.args["numIters"]}')
             train_examples = []
-            
+            self.model.to(torch.device('cpu'))
             for i in range(self.args['numEps'] // self.num_workers):
                 examples = ray.get([sim.execute_episode.remote(self.model) for sim in self.simulations])
                 for exp in examples:
