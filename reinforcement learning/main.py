@@ -20,17 +20,17 @@ if __name__ == '__main__':
     ray.init(ignore_reinit_error=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     set_seed(30)
-    num_workers = 7  # multiprocessing.cpu_count() - 1
+    num_workers = 8  # multiprocessing.cpu_count() - 1
 
     args = {
         'piles': 5,  # 6, 7
         'num_simulations': 50,  # 70, 100
         'batch_size': 128,
-        'numEps': 105,
-        'numIters': 200,
+        'numEps': 104,
+        'numIters': 300,
         'epochs': 3,
         'lr': 0.02,
-        'milestones': [200, 400],
+        'milestones': [200, 500],
         'scheduler_gamma': 0.1,
         'weight_decay': 1e-4,
         'hidden_size': 128,

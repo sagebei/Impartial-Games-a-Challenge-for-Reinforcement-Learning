@@ -13,28 +13,13 @@ import copy
 
 
 @ray.remote
-class ParameterServer:
-    def __init__(self, parameters):
-        self.parameters = parameters
-    
-    def get_parameters(self):
-        return self.parameters
-    
-    def set_parameters(self, parameters):
-        self.parameters = parameters
-        
-
-@ray.remote
 class Simulation:
-    def __init__(self, game, model, args, ps):
+    def __init__(self, game, args):
         self.game = copy.deepcopy(game)
-        self.model = copy.deepcopy(model)
         self.args = args
-        self.ps = ps
 
-    def execute_episode(self):
-        current_weight = ray.get(self.ps.get_parameters.remote())
-        self.model.set_weights(current_weight)
+    def execute_episode(self, model):
+        self.model = model
         mcts = MCTS(self.game, self.model, self.args)
         train_examples = []
         
@@ -89,9 +74,8 @@ class Trainer:
                                      milestones=args['milestones'],
                                      gamma=args['scheduler_gamma'])
 
-        self.ps = ParameterServer.remote(self.model.get_weights())
         self.num_workers = num_workers
-        self.simulations = [Simulation.remote(self.game, self.model, self.args, self.ps) for _ in range(self.num_workers)]
+        self.simulations = [Simulation.remote(self.game, self.args) for _ in range(self.num_workers)]
         
         self.elo = Elo(k=16)
         self.player_pool = PlayerPool(self.elo)
@@ -105,7 +89,7 @@ class Trainer:
             train_examples = []
             
             for i in range(self.args['numEps'] // self.num_workers):
-                examples = ray.get([sim.execute_episode.remote() for sim in self.simulations])
+                examples = ray.get([sim.execute_episode.remote(self.model) for sim in self.simulations])
                 for exp in examples:
                     train_examples.extend(exp)
             shuffle(train_examples)
@@ -189,7 +173,6 @@ class Trainer:
                 batch_idx += 1
                 
             self.scheduler.step()
-            self.ps.set_parameters.remote(self.model.get_weights())
             
             # Factor
             for bf in range(1, self.args['branching_factor']+1):
