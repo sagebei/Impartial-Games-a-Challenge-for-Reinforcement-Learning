@@ -42,8 +42,9 @@ if __name__ == '__main__':
         'epsilon': 0.25,
         'calculate_elo': False
     }
-
-    writer = SummaryWriter("logs/"+"_".join(str(p) if not isinstance(p, list) else "m".join(str(i) for i in p) for p in args.values()))
+    
+    train_id = "_".join(str(p) if not isinstance(p, list) else "m".join(str(i) for i in p) for p in args.values())
+    writer = SummaryWriter("logs/"+train_id)
 
     game = NimEnv(num_piles=args['piles'])
     model = Nim_Model(action_size=game.action_size,
@@ -54,7 +55,7 @@ if __name__ == '__main__':
     trainer.learn()
 
     # save the model after the final update
-    model.save_checkpoint('./models', filename=f'{args["piles"]}_final')
+    model.save_checkpoint('./models', filename=train_id)
 
     writer.close()
     ray.shutdown()
