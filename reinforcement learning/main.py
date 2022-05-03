@@ -34,7 +34,8 @@ if __name__ == '__main__':
         'scheduler_gamma': 0.1,
         'weight_decay': 1e-4,
         'hidden_size': 128,
-        'num_layers': 1,  # 2
+        'num_lstm_layers': 1,  # 2
+        'num_head_layers': 1,
         'branching_factor': 1,
         'exploration_moves': 3,
         'num_samples': 10000,
@@ -49,7 +50,8 @@ if __name__ == '__main__':
     game = NimEnv(num_piles=args['piles'])
     model = Nim_Model(action_size=game.action_size,
                       hidden_size=args['hidden_size'],
-                      num_layers=args['num_layers'])
+                      num_lstm_layers=args['num_lstm_layers'],
+                      num_head_layers=args['num_head_layers'])
 
     trainer = Trainer(game, model, args, writer, device, num_workers=num_workers)
     trainer.learn()
