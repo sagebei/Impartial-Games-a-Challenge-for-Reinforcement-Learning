@@ -7,8 +7,8 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 2, 5, 5, 6, 3]
-num_simulation = 65536
+heaps = [1, 2, 5, 5, 6]
+num_simulation = 100
 
 def win_lose_position(position):
     xor = 0
@@ -34,11 +34,11 @@ state = np.array(state, dtype=np.float64)
 
 game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
-                  hidden_size=128,
-                  num_layers=1)
+                      hidden_size=len(heaps),
+                      num_lstm_layers=2,
+                      num_head_layers=2)
 
-model.load_state_dict(torch.load(f'./models/{len(heaps)}_piles_latest_model', map_location=torch.device('cpu')))
-# model.load_state_dict(torch.load(f'./models/{len(heaps)}_{100}'))
+# model.load_state_dict(torch.load(f'./models/5_100', map_location=torch.device('cpu')))
 
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35,

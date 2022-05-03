@@ -15,11 +15,11 @@ class Nim_Model(nn.Module):
         self.lstm.flatten_parameters()
 
         self.policy_head = nn.Sequential(
-            *[nn.Linear(in_features=hidden_size, out_features=hidden_size) for _ in range(num_head_layers)],
+            *[nn.Linear(in_features=hidden_size, out_features=hidden_size) for _ in range(num_head_layers-1)],
             nn.Linear(in_features=hidden_size, out_features=self.action_size)
         )
         self.value_head = nn.Sequential(
-            *[nn.Linear(in_features=hidden_size, out_features=hidden_size) for _ in range(num_head_layers)],
+            *[nn.Linear(in_features=hidden_size, out_features=hidden_size) for _ in range(num_head_layers-1)],
             nn.Linear(in_features=hidden_size, out_features=1)
         )
 
@@ -68,6 +68,6 @@ if __name__ == '__main__':
 
     game = NimEnv(num_piles=6)
     # model = Nim_Model(game.board_size, game.action_size, device='cpu')
-    model = Nim_Model(action_size=game.action_size, hidden_size=128, num_lstm_layers=1, num_head_layers=3).to('cpu')
+    model = Nim_Model(action_size=game.action_size, hidden_size=128, num_lstm_layers=1, num_head_layers=1).to('cpu')
     pred = model(torch.FloatTensor([[1, -1,  1,  1,  1, -1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1, 1, -1, 0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1,  1,  1,  1,  1,  1,1,  1,  1,  1,  1], [1, -1,  1,  1,  1, -1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1, 1, -1, 0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1,  1,  1,  1,  1,  1,1,  1,  1,  1,  1], [1, -1,  1,  1,  1, -1,  1,  1,  1,  1,  1, -1,  1,  1,  1,  1,  1,  1, 1, -1, 0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1,  1,  1,  1,  1,  1,1,  1,  1,  1,  1]]))
     print(pred)
