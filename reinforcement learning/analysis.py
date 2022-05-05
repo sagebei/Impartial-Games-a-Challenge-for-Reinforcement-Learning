@@ -8,8 +8,8 @@ set_seed(30)
 
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 3, 5, 4, 10]
-num_simulation = 1024
+heaps = [1, 3, 5, 5, 9]
+num_simulation = 65536
 
 def win_lose_position(position):
     xor = 0
@@ -77,7 +77,7 @@ for i, (action, node) in enumerate(root_childrens):
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
         print(f'V:{-value}({(0.5-value/2)*100}%)', end=" ")
-        print(f'N: {node.visit_count}({node.visit_count/total_visit_counts}%)', end='   ')
+        print(f'N: {node.visit_count}({(node.visit_count/total_visit_counts)*100}%)', end='   ')
         print(f'Q value:{-node.value()}', end='   ')
         print(f'WL:{0.5-node.value()/2}')
 
