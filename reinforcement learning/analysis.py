@@ -6,9 +6,10 @@ from model import Nim_Model
 from main import set_seed
 set_seed(30)
 
+
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 2, 5, 5, 6]
-num_simulation = 100
+heaps = [1, 3, 3, 5, 4, 10]
+num_simulation = 1024
 
 def win_lose_position(position):
     xor = 0
@@ -34,24 +35,26 @@ state = np.array(state, dtype=np.float64)
 
 game = NimEnv(num_piles=len(heaps))
 model = Nim_Model(action_size=game.action_size,
-                      hidden_size=len(heaps),
-                      num_lstm_layers=2,
-                      num_head_layers=2)
+                  hidden_size=128,
+                  num_lstm_layers=1,
+                  num_head_layers=1)
 
-# model.load_state_dict(torch.load(f'./models/5_100', map_location=torch.device('cpu')))
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model.load_state_dict(torch.load(f'./models/{len(heaps)}heaps', map_location=device))
 
 args = {'num_simulations': num_simulation,  
-        'alpha': 0.35,
-        'c_puct': 3}
+        'alpha': 0.35}
 mcts = MCTS(game, model, args)
 root = mcts.run(state, game.to_play(), is_train=False)
 
-visit_counts = np.array([child.visit_count for child in root.children.values()])
-visit_count_distribution = visit_counts / sum(visit_counts)
+total_visit_counts = np.array([child.visit_count for child in root.children.values()]).sum()
+
+heap_indices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+root_childrens = root.children.items()
+root_childrens = sorted(root_childrens, key=lambda child: child[1].prior, reverse=True)
 
 print('All the statistics are draw from the perspective of the player who is taking the move')
-heap_indices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-for i, (action, node) in enumerate(root.children.items()):
+for i, (action, node) in enumerate(root_childrens):
     child_state = []
     sum_counter = 0
     
@@ -74,7 +77,7 @@ for i, (action, node) in enumerate(root.children.items()):
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
         print(f'V:{-value}({(0.5-value/2)*100}%)', end=" ")
-        print(f'N: {node.visit_count}({visit_count_distribution[i]*100}%)', end='   ')
+        print(f'N: {node.visit_count}({node.visit_count/total_visit_counts}%)', end='   ')
         print(f'Q value:{-node.value()}', end='   ')
         print(f'WL:{0.5-node.value()/2}')
 
