@@ -8,8 +8,8 @@ set_seed(30)
 
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 5, 5, 9]
-num_simulation = 65536
+heaps = [1, 3, 5]
+num_simulation = 100
 
 def win_lose_position(position):
     xor = 0
@@ -33,14 +33,14 @@ for i, counters in enumerate(heaps):
 
 state = np.array(state, dtype=np.float64)
 
-game = NimEnv(num_piles=len(heaps))
+game = NimEnv(heaps)
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_lstm_layers=1,
                   num_head_layers=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.load_state_dict(torch.load(f'./models/{len(heaps)}heaps', map_location=device))
+# model.load_state_dict(torch.load(f'./models/{len(heaps)}heaps', map_location=device))
 
 args = {'num_simulations': num_simulation,  
         'alpha': 0.35}

@@ -6,6 +6,8 @@ class NimEnv:
         super(NimEnv, self).__init__()
         self.nim_game = NimUnitary(initial_pos)
         self.nim_game_copy = NimUnitary(initial_pos)
+
+        self.action_size = self.nim_game.action_size
         self.player = 1
     
     def to_play(self):
@@ -37,8 +39,8 @@ class NimEnv:
         
         return obs.copy(), reward, done
 
-    def get_action_masks(self):
-        return self.nim_game.get_action_mask()
+    def get_action_mask(self, state):
+        return self.nim_game.get_action_mask(state)
        
 
 class NimUnitary(object):
