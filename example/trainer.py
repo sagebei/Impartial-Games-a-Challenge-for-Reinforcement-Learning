@@ -195,7 +195,7 @@ class Trainer:
                 
             self.epoch_counter += 1
             if self.epoch_counter % 100 == 0:
-                self.model.save_checkpoint('./models', filename=f'{self.args["piles"]}_{self.epoch_counter}')
+                self.model.save_checkpoint('./models', filename=f'{len(self.args["initial_position"])}_{self.epoch_counter}')
 
     def eval_policy_value_acc(self, branching_factor=1, value_threshold=1.0):
         self.model.eval()

@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     args = {
         'initial_position': [1, 3, 5],  # 6, 7
-        'num_simulations': 50,  # 70, 100
+        'num_simulations': 20,  # 70, 100
         'batch_size': 128,
         'numEps': 104,
         'numIters': 2000,
