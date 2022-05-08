@@ -6,34 +6,26 @@ from model import Nim_Model
 from main import set_seed
 set_seed(30)
 
-
-# board size: [1, 3, 5, 7, 9]
-heaps = [1, 3, 5]
-num_simulation = 100
-
 def win_lose_position(position):
     xor = 0
-    for c in child_state:
+    for c in position:
         xor = c ^ xor
     if xor == 0:
         win_lost = 'WIN'
-    else: 
+    else:
         win_lost = 'LOSE'
     return win_lost
 
-state = []
-for i, counters in enumerate(heaps):
-    num_counters = 2 * i + 1
-    heap = [0 for _ in range(num_counters)]
-    for c in range(1, counters+1):
-        heap[-c] = 1
-    if i < len(heaps) - 1:
-        heap.append(-1)
-    state.extend(heap)
+# board size: [1, 3, 5, 7, 9]
+heaps = [2, 1, 1]
+num_simulation = 10000
 
-state = np.array(state, dtype=np.float64)
+game = NimEnv(initial_pos=[2, 2, 2])
+game.reset()
+state = game.convert_state(heaps)
+print(state)
 
-game = NimEnv(heaps)
+
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
                   num_lstm_layers=1,
