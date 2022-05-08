@@ -98,7 +98,7 @@ class NimUnitary(object):
     def observe(self):
         return self.board.copy()
 
-    def heaps_to_state(self, heaps):
+    def position_to_state(self, position):
         # build empty state
         state = np.zeros((self.board_size,), dtype=np.float64)
         # mark the separator
@@ -109,7 +109,7 @@ class NimUnitary(object):
         # add the counters
         sep_idx = np.where(self.board == -1.0)[0].tolist()
         sep_idx.append(-1)
-        for idx, n_counters in zip(sep_idx, heaps):
+        for idx, n_counters in zip(sep_idx, position):
             if idx == -1:
                 for n in range(n_counters):
                     state[idx - n] = 1.0
@@ -149,8 +149,30 @@ class NimUnitary(object):
         for n in self.initial_pos:
             heap.append([i for i in range(n+1)])
         heaps = list(itertools.product(*heap))
-        state_space = list(map(self.heaps_to_state, heaps))
+        state_space = list(map(self.position_to_state, heaps))
         return state_space
+
+    def get_states_policies_values_masks(self, num_samples=10000):
+        state_space = self.get_state_space()
+        policy_space = []
+        value_space = []
+        mask_space = []
+
+        for state in state_space:
+            position = self.state_to_position(state)
+            policy, value = self.evaluate_position(position)
+            mask = self.get_action_mask(state)
+            policy_space.append(policy)
+            value_space.append(value)
+            mask_space.append(mask)
+
+        idx = np.random.permutation(len(state_space))
+        state_space = np.array(state_space)[idx][:num_samples]
+        policy_space = np.array(policy_space, dtype=object)[idx][:num_samples]
+        value_space = np.array(value_space)[idx][:num_samples]
+        mask_space = np.array(mask_space)[idx][:num_samples]
+
+        return state_space.tolist(), policy_space.tolist(), value_space.tolist(), mask_space.tolist()
 
     def move_on_position(self, position, move):
         position = deepcopy(position)
@@ -169,11 +191,11 @@ class NimUnitary(object):
 
     def legal_moves_on_position(self, position):
         legal_moves = []
-        mask = self.get_action_mask(self.heaps_to_state(position))
+        mask = self.get_action_mask(self.position_to_state(position))
         for m, a in zip(mask, self.action_space):
             if m == 1:
                 legal_moves.append(a)
-        return legal_moves
+        return deepcopy(legal_moves)
 
     def evaluate_position(self, position):
         winning_move = []
@@ -182,18 +204,17 @@ class NimUnitary(object):
             for move in legal_moves:
                 next_position = self.move_on_position(position, move)
                 if not self.is_winning_position(next_position):
-                    winning_move.append(move)
+                    policy = np.zeros((self.action_size,), dtype=np.float64)
+                    policy[self.action_space.index(move)] = 1.0
+                    winning_move.append(policy)
             return winning_move, 1
         else:
             return [], -1
 
 
 if __name__ == '__main__':
-    nim = NimUnitary(initial_pos=[1, 3, 5])
-    for state in nim.get_state_space():
-        position = nim.state_to_position(state)
-        print('-------------------------')
-        print(position)
-        print(nim.legal_moves_on_position(position))
-        print(nim.is_winning_position(position))
-        print(nim.evaluate_position(position))
+    nim = NimUnitary(initial_pos=[2, 1, 1])
+    state_space, policy_space, value_space, mask_space = nim.get_states_policies_values_masks()
+
+    print('')
+
