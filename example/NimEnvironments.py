@@ -1,4 +1,6 @@
 import numpy as np
+import itertools
+from copy import deepcopy
 
 
 class NimEnv:
@@ -61,12 +63,14 @@ class NimUnitary(object):
         self.position = initial_pos
         self.board = np.ones((self.board_size,), dtype=np.float64)
         self.sep_idx = [-1]
+
+        self.initialize()
     
     def initialize(self):
         # mark the separator on the board
         idx = -1
-        for num_heaps in self.initial_pos[:-1]:
-            idx += (num_heaps + 1)
+        for num_counters in self.initial_pos[:-1]:
+            idx += (num_counters + 1)
             self.board[idx] = -1
         self.sep_idx.extend(np.where(self.board == -1)[0])
         # construct the action space
@@ -84,20 +88,6 @@ class NimUnitary(object):
             elif self.board[heap_idx + idx] == 1.0:
                 self.board[heap_idx + idx] = 0.0
                 n_counters -= 1
-
-    def get_action_mask(self, position):
-        mask = np.zeros((self.action_size,), dtype=np.float64)
-        n_heaps = 0
-        n_counter = 0
-        for counter in position:
-            if counter == 1:
-                n_counter += 1
-                action_idx = self.action_space.index((n_heaps, n_counter))
-                mask[action_idx] = 1.0
-            elif counter == -1:
-                n_heaps += 1
-                n_counter = 0
-        return mask
     
     def is_done(self):
         if self.board.sum() == (self.num_heaps - 1) * -1.0:
@@ -106,19 +96,18 @@ class NimUnitary(object):
             return False
     
     def observe(self):
-
         return self.board.copy()
 
-    def convert_state(self, heaps):
+    def heaps_to_state(self, heaps):
         # build empty state
         state = np.zeros((self.board_size,), dtype=np.float64)
         # mark the separator
         idx = -1
         for num_heaps in self.initial_pos[:-1]:
             idx += (num_heaps + 1)
-            state[idx] = -1
+            state[idx] = -1.0
         # add the counters
-        sep_idx = np.where(self.board == -1)[0].tolist()
+        sep_idx = np.where(self.board == -1.0)[0].tolist()
         sep_idx.append(-1)
         for idx, n_counters in zip(sep_idx, heaps):
             if idx == -1:
@@ -127,31 +116,84 @@ class NimUnitary(object):
             else:
                 for n in range(1, n_counters + 1):
                     state[idx - n] = 1.0
-
         return state
 
+    def state_to_position(self, state):
+        position = []
+        heap = 0
+        for s in state:
+            if s == -1:
+                position.append(int(heap))
+                heap = 0
+            else:
+                heap += s
+        position.append(int(heap))
+        return position
+
+    def get_action_mask(self, state):
+        mask = np.zeros((self.action_size,), dtype=np.float64)
+        n_heaps = 0
+        n_counter = 0
+        for counter in state:
+            if counter == 1:
+                n_counter += 1
+                action_idx = self.action_space.index((n_heaps, n_counter))
+                mask[action_idx] = 1.0
+            elif counter == -1:
+                n_heaps += 1
+                n_counter = 0
+        return mask
+
+    def get_state_space(self):
+        heap = []
+        for n in self.initial_pos:
+            heap.append([i for i in range(n+1)])
+        heaps = list(itertools.product(*heap))
+        state_space = list(map(self.heaps_to_state, heaps))
+        return state_space
+
+    def move_on_position(self, position, move):
+        position = deepcopy(position)
+        heap_idx, n_counters = move
+        position[heap_idx] -= n_counters
+        return position
+
+    def is_winning_position(self, position):
+        xor = 0
+        for c in position:
+            xor = c ^ xor
+        if xor == 0:
+            return False
+        else:
+            return True
+
+    def legal_moves_on_position(self, position):
+        legal_moves = []
+        mask = self.get_action_mask(self.heaps_to_state(position))
+        for m, a in zip(mask, self.action_space):
+            if m == 1:
+                legal_moves.append(a)
+        return legal_moves
+
+    def evaluate_position(self, position):
+        winning_move = []
+        if self.is_winning_position(position):
+            legal_moves = self.legal_moves_on_position(position)
+            for move in legal_moves:
+                next_position = self.move_on_position(position, move)
+                if not self.is_winning_position(next_position):
+                    winning_move.append(move)
+            return winning_move, 1
+        else:
+            return [], -1
+
+
 if __name__ == '__main__':
-    nim = NimEnv(initial_pos=[2, 3, 4])
-    state = nim.reset()
-    print(nim.nim_game.board)
-    print(nim.get_action_mask(state))
-
-    next_state, reward, done = nim.get_next_state(state, (0, 1))
-    print(next_state, reward, done, nim.get_action_mask(next_state))
-
-    next_state, reward, done = nim.get_next_state(next_state, (1, 3))
-    print(next_state, reward, done, nim.get_action_mask(next_state))
-
-    next_state, reward, done = nim.get_next_state(next_state, (2, 4))
-    print(next_state, reward, done, nim.get_action_mask(next_state))
-
-    next_state, reward, done = nim.get_next_state(next_state, (0, 1))
-    print(next_state, reward, done, nim.get_action_mask(next_state))
-
-    nim = NimEnv(initial_pos=[2, 3, 4])
-    state = nim.reset()
-
-    print(nim.step((0, 2)))
-    print(nim.step((1, 3)))
-    print(nim.step((2, 2)))
-    print(nim.step((2, 2)))
+    nim = NimUnitary(initial_pos=[1, 3, 5])
+    for state in nim.get_state_space():
+        position = nim.state_to_position(state)
+        print('-------------------------')
+        print(position)
+        print(nim.legal_moves_on_position(position))
+        print(nim.is_winning_position(position))
+        print(nim.evaluate_position(position))

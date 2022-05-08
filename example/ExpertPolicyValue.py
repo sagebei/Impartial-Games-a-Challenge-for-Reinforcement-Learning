@@ -39,66 +39,12 @@ def winning_policy_value(state, num_piles=6):
     return policies, value, mask
     
 
-def get_state_space(num_pile=6):
-    state_list = []
-    for i in range(num_pile):
-        num_matches = 2 * i + 1
-        states = []
-        state = [0.0 for _ in range(num_matches)]
-        
-        states.append(state.copy())
-        for j in range(1, num_matches+1):
-            state[-j] = 1.0
-            states.append(state.copy())
-            
-        state_list.append(states.copy())
-
+def get_state_space(initial_pos=[1, 3, 5]):
     state_space = []
-    if num_pile == 7:
-        a, b, c, d, e, f, g = state_list
-        for ai in a:
-            for bi in b:
-                for ci in c:
-                    for di in d:
-                        for ei in e:
-                            for fi in f:
-                                for gi in g:
-                                    state = ai + [-1.0] + bi + [-1.0] + ci + [-1.0] + di + [-1.0] + ei + [-1.0] + fi + [-1.0] + gi
-                                    state_space.append(state.copy())
-    elif num_pile == 6:
-        a, b, c, d, e, f = state_list
-        for ai in a:
-            for bi in b:
-                for ci in c:
-                    for di in d:
-                        for ei in e:
-                            for fi in f:
-                                state = ai + [-1.0] + bi + [-1.0] + ci + [-1.0] + di + [-1.0] + ei + [-1.0] + fi
-                                state_space.append(state.copy())
-    elif num_pile == 5:
-        a, b, c, d, e = state_list
-        for ai in a:
-            for bi in b:
-                for ci in c:
-                    for di in d:
-                        for ei in e:
-                            state = ai + [-1.0] + bi + [-1.0] + ci + [-1.0] + di + [-1.0] + ei
-                            state_space.append(state.copy())
-    elif num_pile == 4:
-        a, b, c, d = state_list
-        for ai in a:
-            for bi in b:
-                for ci in c:
-                    for di in d:
-                        state = ai + [-1.0] + bi + [-1.0] + ci + [-1.0] + di
-                        state_space.append(state.copy())
-    elif num_pile == 3:
-        a, b, c = state_list
-        for ai in a:
-            for bi in b:
-                for ci in c:
-                    state = ai + [-1.0] + bi + [-1.0] + ci
-                    state_space.append(state.copy())
+    for heap in initial_pos:
+        for counter in range(heap + 1):
+            state_space.append(counter)
+
     return state_space
 
 

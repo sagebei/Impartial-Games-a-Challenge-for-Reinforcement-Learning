@@ -20,7 +20,7 @@ if __name__ == '__main__':
     ray.init(ignore_reinit_error=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     set_seed(30)
-    num_workers = 8  # multiprocessing.cpu_count() - 1
+    num_workers = 3  # multiprocessing.cpu_count() - 1
 
     args = {
         'piles': 5,  # 6, 7
