@@ -51,6 +51,9 @@ class NimEnv:
     def get_action_mask(self, state):
         return self.nim_game.get_action_mask(state)
 
+    def position_to_state(self, position):
+        return self.nim_game.position_to_state(position)
+
     def get_states_policies_values_masks(self, num_samples=10000):
         return self.nim_game.get_states_policies_values_masks(num_samples)
 

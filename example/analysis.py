@@ -17,12 +17,12 @@ def win_lose_position(position):
     return win_lost
 
 # board size: [1, 3, 5, 7, 9]
-heaps = [2, 1, 1]
+position = [1, 3, 5]
 num_simulation = 10000
 
-game = NimEnv(initial_pos=[2, 2, 2])
+game = NimEnv(initial_pos=[1, 3, 5])
 game.reset()
-state = game.convert_state(heaps)
+state = game.position_to_state(position)
 print(state)
 
 
@@ -60,7 +60,7 @@ for i, (action, node) in enumerate(root_childrens):
                 sum_counter += counter
         child_state.append(sum_counter)
 
-        for idx, child_heap in enumerate(zip(child_state, heaps)):
+        for idx, child_heap in enumerate(zip(child_state, position)):
             if child_heap[0] != child_heap[1]:
                 removed_matches = child_heap[1] - child_heap[0]
                 child_move = f'{heap_indices[idx]}{removed_matches}'
@@ -74,7 +74,7 @@ for i, (action, node) in enumerate(root_childrens):
         print(f'WL:{0.5-node.value()/2}')
 
 _, value = model.predict(root.state)
-print(f'root:{heaps} {win_lose_position(heaps)} ', end='')
+print(f'root:{position} {win_lose_position(position)} ', end='')
 print(f'V:{value}', end=" ")
 print(f'WL:{(0.5 + root.value()/2)*100}%')
 print(num_simulation)
