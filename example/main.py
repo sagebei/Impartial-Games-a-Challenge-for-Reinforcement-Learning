@@ -23,7 +23,7 @@ if __name__ == '__main__':
     num_workers = 3  # multiprocessing.cpu_count() - 1
 
     args = {
-        'piles': 5,  # 6, 7
+        'initial_position': [1, 3, 5],  # 6, 7
         'num_simulations': 50,  # 70, 100
         'batch_size': 128,
         'numEps': 104,
@@ -44,10 +44,10 @@ if __name__ == '__main__':
         'calculate_elo': False
     }
     
-    train_id = "_".join(str(p) if not isinstance(p, list) else "m".join(str(i) for i in p) for p in args.values())
+    train_id = "_".join(str(p) if not isinstance(p, list) else "n".join(str(i) for i in p) for p in args.values())
     writer = SummaryWriter("logs/"+train_id)
 
-    game = NimEnv(initial_pos=[1, 3, 5, 7, 9])
+    game = NimEnv(initial_pos=args['initial_position'])
     game.reset()
 
     model = Nim_Model(action_size=game.action_size,

@@ -8,8 +8,10 @@ class NimEnv:
         super(NimEnv, self).__init__()
         self.nim_game = NimUnitary(initial_pos)
         self.nim_game_copy = NimUnitary(initial_pos)
+
         self.action_size = self.nim_game.action_size
         self.action_space = self.nim_game.action_space
+
         self.player = 1
     
     def to_play(self):
@@ -44,13 +46,14 @@ class NimEnv:
         
         self.player *= -1
         
-        return obs.copy(), reward, done
+        return obs, reward, done
 
     def get_action_mask(self, state):
         return self.nim_game.get_action_mask(state)
 
-    def convert_state(self, state):
-        return self.nim_game.convert_state(state)
+    def get_states_policies_values_masks(self, num_samples=10000):
+        return self.nim_game.get_states_policies_values_masks(num_samples)
+
        
 
 class NimUnitary(object):
@@ -61,13 +64,14 @@ class NimUnitary(object):
         self.action_space = []
         self.board_size = np.sum(initial_pos, dtype=np.int32) + self.num_heaps - 1
         self.position = initial_pos
-        self.board = np.ones((self.board_size,), dtype=np.float64)
+        self.board = None
         self.sep_idx = [-1]
 
         self.initialize()
     
     def initialize(self):
         # mark the separator on the board
+        self.board = np.ones((self.board_size,), dtype=np.float64)
         idx = -1
         for num_counters in self.initial_pos[:-1]:
             idx += (num_counters + 1)
@@ -96,7 +100,7 @@ class NimUnitary(object):
             return False
     
     def observe(self):
-        return self.board.copy()
+        return deepcopy(self.board)
 
     def position_to_state(self, position):
         # build empty state
@@ -213,7 +217,7 @@ class NimUnitary(object):
 
 
 if __name__ == '__main__':
-    nim = NimUnitary(initial_pos=[2, 1, 1])
+    nim = NimUnitary(initial_pos=[3, 2, 6])
     state_space, policy_space, value_space, mask_space = nim.get_states_policies_values_masks()
 
     print('')

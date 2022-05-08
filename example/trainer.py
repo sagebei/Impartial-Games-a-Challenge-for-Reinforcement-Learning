@@ -7,7 +7,6 @@ from NimEnvironments import NimEnv
 from monte_carlo_tree_search import MCTS
 from EloRating import Elo
 from PlayerPool import PlayerPool
-from ExpertPolicyValue import get_states_policies_values_masks
 import ray
 import copy
 
@@ -57,6 +56,7 @@ class Simulation:
                     return examples
 
 
+
 class Trainer:
     def __init__(self, game, model, args, writer, device, num_workers=4):
         self.game = game
@@ -80,8 +80,9 @@ class Trainer:
         self.elo = Elo(k=16)
         self.player_pool = PlayerPool(self.elo)
         # get some sampled states and their associated winning move and value.
-        self.state_space, self.policy_space, self.value_space, self.masks = get_states_policies_values_masks(game.num_piles,
-                                                                                                             num_samples=self.args['num_samples'])
+        self.state_space, self.policy_space, self.value_space, self.masks = \
+            self.game.get_states_policies_values_masks(num_samples=self.args['num_samples'])
+
 
     def learn(self):
         for i in range(1, self.args['numIters'] + 1):
@@ -97,7 +98,7 @@ class Trainer:
             self.train(train_examples)
 
     def play(self, first_player_model, second_player_model):
-        game = NimEnv(num_piles=self.args['piles'])
+        game = NimEnv(initial_pos=self.args['initial_position'])
         first_player_mcts = MCTS(game, first_player_model, self.args)
         second_player_mcts = MCTS(game, second_player_model, self.args)
 

@@ -46,7 +46,6 @@ class Nim_Model(nn.Module):
         
         with torch.no_grad():
             policy, value = self(state)
-
         return policy.squeeze().data.cpu().numpy(), value.item()
 
     def save_checkpoint(self, folder='.', filename='checkpoint_model'):

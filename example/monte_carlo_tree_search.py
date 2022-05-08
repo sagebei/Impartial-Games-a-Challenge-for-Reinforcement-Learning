@@ -93,6 +93,7 @@ class MCTS:
 
         action_probs, _ = self.model.predict(state)  # obtain the probability distribution over all the actions.
         action_masks = self.game.get_action_mask(state)  # obtain the action mask
+
         action_probs = action_probs * action_masks  # mask out the illegal actions
         action_probs /= np.sum(action_probs)   # re-normalize the probabilities for remaining moves
 
@@ -110,6 +111,7 @@ class MCTS:
 
             parent = search_path[-2]  # the parent node of the leaf node
             next_state, reward, done = self.game.get_next_state(parent.state, action)
+
             # If the next_state is not the terminal state, expand the node that represents the next_state
             if not done:
                 action_probs_pred, value = self.model.predict(next_state)
