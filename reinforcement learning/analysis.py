@@ -13,7 +13,7 @@ num_simulation = 65536
 
 def win_lose_position(position):
     xor = 0
-    for c in child_state:
+    for c in position:
         xor = c ^ xor
     if xor == 0:
         win_lost = 'WIN'
