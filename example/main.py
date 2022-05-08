@@ -47,7 +47,9 @@ if __name__ == '__main__':
     train_id = "_".join(str(p) if not isinstance(p, list) else "m".join(str(i) for i in p) for p in args.values())
     writer = SummaryWriter("logs/"+train_id)
 
-    game = NimEnv(num_piles=args['piles'])
+    game = NimEnv(initial_pos=[1, 3, 5, 7, 9])
+    game.reset()
+
     model = Nim_Model(action_size=game.action_size,
                       hidden_size=args['hidden_size'],
                       num_lstm_layers=args['num_lstm_layers'],
