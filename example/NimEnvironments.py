@@ -54,10 +54,15 @@ class NimEnv:
     def position_to_state(self, position):
         return self.nim_game.position_to_state(position)
 
+    def state_to_position(self, state):
+        return self.nim_game.state_to_position(state)
+
+    def is_winning_position(self, position):
+        return self.nim_game.is_winning_position(position)
+
     def get_states_policies_values_masks(self, num_samples=10000):
         return self.nim_game.get_states_policies_values_masks(num_samples)
 
-       
 
 class NimUnitary(object):
     def __init__(self, initial_pos=[2, 1, 1, 1, 1]):

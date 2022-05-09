@@ -6,16 +6,6 @@ from model import Nim_Model
 from main import set_seed
 set_seed(30)
 
-def win_lose_position(position):
-    xor = 0
-    for c in position:
-        xor = c ^ xor
-    if xor == 0:
-        win_lost = 'WIN'
-    else:
-        win_lost = 'LOSE'
-    return win_lost
-
 # board size: [1, 3, 5, 7, 9]
 position = [1, 3, 5]
 num_simulation = 10000
@@ -65,7 +55,7 @@ for i, (action, node) in enumerate(root_childrens):
                 removed_matches = child_heap[1] - child_heap[0]
                 child_move = f'{heap_indices[idx]}{removed_matches}'
 
-        print(f'{child_move}: {child_state} {win_lose_position(child_state)}', end='   ')
+        print(f'{child_move}: {child_state} {game.is_winning_position(game.state_to_position(node.state))}', end='   ')
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
         print(f'V:{-value}({(0.5-value/2)*100}%)', end=" ")
@@ -74,7 +64,7 @@ for i, (action, node) in enumerate(root_childrens):
         print(f'WL:{0.5-node.value()/2}')
 
 _, value = model.predict(root.state)
-print(f'root:{position} {win_lose_position(position)} ', end='')
+print(f'root:{position} {game.is_winning_position(position)} ', end='')
 print(f'V:{value}', end=" ")
 print(f'WL:{(0.5 + root.value()/2)*100}%')
 print(num_simulation)
