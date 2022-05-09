@@ -118,12 +118,12 @@ class MCTS:
                 action_masks = self.game.get_action_mask(next_state)
                 action_probs = action_probs_pred * action_masks  # mask out illegal moves
                 action_probs /= np.sum(action_probs)
-                node.expand(next_state, self.game.to_play(), action_probs)
+                node.expand(next_state, parent.to_play * -1, action_probs)
             else:
                 value = -reward
 
             # update all the nodes at the end of the simulation
-            self.backpropagate(search_path, value, self.game.to_play())
+            self.backpropagate(search_path, value, parent.to_play * -1)
         
         return root
 
