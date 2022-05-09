@@ -61,3 +61,5 @@ print(f'root:{test_position} {game.is_winning_position(test_position)} ', end=''
 print(f'V:{value}', end=" ")
 print(f'WL:{(0.5 + root.value()/2)*100}%')
 print(num_simulation)
+
+

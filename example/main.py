@@ -25,6 +25,7 @@ if __name__ == '__main__':
     initial_pos = [2]
     initial_pos.extend([1 for _ in range(1, 20)])
     print(initial_pos)
+
     args = {
         'initial_position': initial_pos,  # 6, 7
         'num_simulations': 50,  # 70, 100
