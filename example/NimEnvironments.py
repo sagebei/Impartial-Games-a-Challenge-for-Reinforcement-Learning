@@ -225,7 +225,7 @@ class NimUnitary(object):
 
 
 if __name__ == '__main__':
-    nim = NimUnitary(initial_pos=[3, 2, 6])
+    nim = NimUnitary(initial_pos=[2, 1, 1, 1, 1, 1])
     state_space, policy_space, value_space, mask_space = nim.get_states_policies_values_masks()
 
     print('')

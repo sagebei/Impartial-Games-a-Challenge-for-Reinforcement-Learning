@@ -7,10 +7,10 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-position = [1, 3, 5]
-num_simulation = 10000
+position = [2, 1, 1, 1, 1, 1, 1, 1]
+num_simulation = 100000
 
-game = NimEnv(initial_pos=[1, 3, 5])
+game = NimEnv(initial_pos=[2, 1, 1, 1, 1, 1, 1, 1])
 game.reset()
 state = game.position_to_state(position)
 print(state)
@@ -31,7 +31,7 @@ root = mcts.run(state, game.to_play(), is_train=False)
 
 total_visit_counts = np.array([child.visit_count for child in root.children.values()]).sum()
 
-heap_indices = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+heap_indices = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']
 root_childrens = root.children.items()
 root_childrens = sorted(root_childrens, key=lambda child: child[1].prior, reverse=True)
 
