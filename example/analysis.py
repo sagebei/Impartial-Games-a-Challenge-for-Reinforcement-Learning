@@ -8,14 +8,16 @@ from main import set_seed
 set_seed(30)
 
 # board size: [1, 3, 5, 7, 9]
-initial_pos = [2, 1, 1, 1, 1, 1, 1, 1]
-test_position = [2, 1, 1, 1, 1, 1, 1, 1]
-num_simulation = 100000
+initial_pos = [2]
+initial_pos.extend([1 for _ in range(1, 15)])
+test_position = [2, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1]
+num_simulation = 100
+print(test_position)
+
 
 game = NimEnv(initial_pos=initial_pos)
 game.reset()
 state = game.position_to_state(test_position)
-print(state)
 
 model = Nim_Model(action_size=game.action_size,
                   hidden_size=128,
@@ -23,7 +25,7 @@ model = Nim_Model(action_size=game.action_size,
                   num_head_layers=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# model.load_state_dict(torch.load(f'./models/{len(heaps)}heaps', map_location=device))
+model.load_state_dict(torch.load(f'./models/15_600', map_location=device))
 
 args = {'num_simulations': num_simulation}
 mcts = MCTS(game, model, args)
@@ -43,7 +45,7 @@ for i, (action, node) in enumerate(root_childrens):
     # if the node has been visited
     if node.state is not None: 
         child_state = game.state_to_position(node.state)
-        for idx, child_heap in enumerate(zip(child_state, initial_pos)):
+        for idx, child_heap in enumerate(zip(child_state, test_position)):
             if child_heap[0] != child_heap[1]:
                 removed_matches = child_heap[1] - child_heap[0]
                 child_move = f'{heap_indices[idx]}{removed_matches}'
