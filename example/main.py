@@ -23,10 +23,11 @@ if __name__ == '__main__':
     num_workers = 8  # multiprocessing.cpu_count() - 1
 
     initial_pos = [2]
-    initial_pos.extend([i for i in range(1, 20)])
+    initial_pos.extend([1 for _ in range(1, 20)])
+    print(initial_pos)
     args = {
         'initial_position': initial_pos,  # 6, 7
-        'num_simulations': 20,  # 70, 100
+        'num_simulations': 50,  # 70, 100
         'batch_size': 128,
         'numEps': 104,
         'numIters': 2000,
