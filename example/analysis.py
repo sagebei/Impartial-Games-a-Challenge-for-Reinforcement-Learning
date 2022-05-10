@@ -31,7 +31,7 @@ model = Nim_Model(action_size=game.action_size,
                   num_head_layers=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.load_state_dict(torch.load(f'./models/15_600', map_location=device))
+model.load_state_dict(torch.load(f'./models/15_200', map_location=device))
 
 args = {'num_simulations': num_simulation}
 mcts = MCTS(game, model, args)
