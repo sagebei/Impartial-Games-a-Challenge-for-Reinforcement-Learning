@@ -10,9 +10,15 @@ set_seed(30)
 # board size: [1, 3, 5, 7, 9]
 initial_pos = [2]
 initial_pos.extend([1 for _ in range(1, 15)])
-test_position = [2, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1]
+# test_position = [2, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1]
+test_position = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
 num_simulation = 100
 print(test_position)
+
+# initial_pos = [1, 3, 5, 7, 9]
+# test_position = [1, 3, 2, 7, 2]
+# num_simulation = 100
+# print(test_position)
 
 
 game = NimEnv(initial_pos=initial_pos)
@@ -50,7 +56,7 @@ for i, (action, node) in enumerate(root_childrens):
                 removed_matches = child_heap[1] - child_heap[0]
                 child_move = f'{heap_indices[idx]}{removed_matches}'
 
-        print(f'{child_move}: {child_state} {game.is_winning_position(game.state_to_position(node.state))}', end='   ')
+        print(f'{child_move}: {child_state} {not game.is_winning_position(game.state_to_position(node.state))}', end='   ')
         print(f'P:{node.prior}', end="  ")
         _, value = model.predict(node.state)
         print(f'V:{-value}({(0.5-value/2)*100}%)', end=" ")
@@ -59,7 +65,7 @@ for i, (action, node) in enumerate(root_childrens):
         print(f'WL:{0.5-node.value()/2}')
 
 _, value = model.predict(root.state)
-print(f'root:{test_position} {game.is_winning_position(test_position)} ', end='')
+print(f'root:{test_position} {not game.is_winning_position(test_position)} ', end='')
 print(f'V:{value}', end=" ")
 print(f'WL:{(0.5 + root.value()/2)*100}%')
 print(num_simulation)
