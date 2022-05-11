@@ -7,19 +7,13 @@ import string
 from main import set_seed
 set_seed(30)
 
-# board size: [1, 3, 5, 7, 9]
+
 initial_pos = [2]
 initial_pos.extend([1 for _ in range(1, 15)])
 # test_position = [2, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1]
-test_position = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+test_position = [2, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1]
 num_simulation = 100
 print(test_position)
-
-# initial_pos = [1, 3, 5, 7, 9]
-# test_position = [1, 3, 2, 7, 2]
-# num_simulation = 100
-# print(test_position)
-
 
 game = NimEnv(initial_pos=initial_pos)
 game.reset()
@@ -31,7 +25,7 @@ model = Nim_Model(action_size=game.action_size,
                   num_head_layers=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.load_state_dict(torch.load(f'./models/15_200', map_location=device))
+model.load_state_dict(torch.load(f'./models/15_1600', map_location=device))
 
 args = {'num_simulations': num_simulation}
 mcts = MCTS(game, model, args)
