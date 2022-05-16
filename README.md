@@ -1,5 +1,5 @@
 
-## Impartial Games - A Challenge to Reinforcement Learning
+## Impartial Games - A Challenge for Reinforcement Learning
 
 This repository contains all the python scripts used in the experiments of this paper, which are organized in the folders as following:
 
