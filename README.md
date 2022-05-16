@@ -8,13 +8,12 @@ This repository contains all the python scripts used in the experiments of this 
 * **reinforcement learning**: includes the codes used in section *7. Reinforcement learning on for nim*
 * **example**: includes the codes and experiment setup for the example 2 in section *4. Different level of mastery*
 
-<br /> 
-To run and replicate our results, please refer to our paper for the experiment configurations. The trained models are stored in the **model** folder. The name of the model files reflexs the board size of the nim they were trained on. For example, the file named **5heaps** is the model for the 5 heaps nim. 
+### Notes on using our codes:
+* To run and replicate our results, please refer to our paper for the experiment configurations. The trained models are stored in the **model** folder. The name of the model files reflexs the board size of the nim they were trained on. For example, the file named **5heaps** is the model for the 5 heaps nim. 
+* We support conducting analysis on specifed nim positions on 5, 6 and 7 heaps using trained models. The results on running the analysis on the initial position of a 5 heap nim is shown below. 
 
-<br /> 
-![alt text](https://github.com/sagebei/Impartial-Games-a-Chanllenge-to-Reinforcement-Learning/blob/main/images/analysis_on_nim_board_position.png)
+![text](https://github.com/sagebei/Impartial-Games-a-Chanllenge-to-Reinforcement-Learning/blob/main/images/analysis_on_nim_board_position.png)
 
-<br /> 
 ### Bibtex
 ```
 Cite our paper by 
