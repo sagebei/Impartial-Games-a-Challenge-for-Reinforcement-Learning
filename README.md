@@ -3,10 +3,10 @@
 
 This repository contains all the python scripts used in the experiments of this paper, which are organized in the folders as following:
 
-* **value networks**: includes the codes used in section *5.1 Model parity function using value networks*. 
-* **policy networks**:  includes the codes used in section *5.2 Learn winning moves using policy networks*
-* **reinforcement learning**: includes the codes used in section *7. Reinforcement learning on for nim*
-* **example**: includes the codes and experiment setup for the example 2 in section *4. Different level of mastery*
+1. **example**: includes the codes and experiment setup for the example 2 in section *4. Different level of mastery*
+2. **value networks**: includes the codes used in section *5.1 Model parity function using value networks*. 
+3. **policy networks**:  includes the codes used in section *5.2 Learn winning moves using policy networks*
+4. **reinforcement learning**: includes the codes used in section *7. Reinforcement learning on for nim*
 
 ### Notes on using our codes:
 * We would recommend running our codes in a python virtual environment, which can be created by running 
