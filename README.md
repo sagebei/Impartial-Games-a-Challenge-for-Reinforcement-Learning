@@ -12,13 +12,13 @@ This repository contains all the python scripts used in the experiments of this 
 To run and replicate our results, please refer to our paper for the experiment configurations. The trained models are stored in the **model** folder. The name of the model files reflexs the board size of the nim they were trained on. For example, the file named **5heaps** is the model for the 5 heaps nim. 
 
 <br /> 
-
+![alt text](https://github.com/sagebei/Impartial-Games-a-Chanllenge-to-Reinforcement-Learning/blob/main/images/analysis_on_nim_board_position.png)
 
 <br /> 
 ### Bibtex
 ```
-
+Cite our paper by 
 ```
 
-![image](https://user-images.githubusercontent.com/94320323/168624404-b05b4a6d-1330-4862-9404-d1da705d9692.png)
+
 
