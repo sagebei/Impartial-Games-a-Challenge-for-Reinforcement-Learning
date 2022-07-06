@@ -28,7 +28,12 @@ in a terminal. Then download our repository and install all the required package
 
 ### Bibtex
 ```
-Cite our paper by 
+@article{zhou2022impartial,
+  title={Impartial Games: A Challenge for Reinforcement Learning},
+  author={Zhou, Bei and Riis, S{\o}ren},
+  journal={arXiv preprint arXiv:2205.12787},
+  year={2022}
+}
 ```
 
 
