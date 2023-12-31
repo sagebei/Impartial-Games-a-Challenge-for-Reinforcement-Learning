@@ -5,6 +5,7 @@ This repository contains all the Python scripts used in the experiments of this 
 
 1. **example**: includes the codes and experiment setup for example 2 in section *4. Two levels of mastery*
 2. **reinforcement learning**: includes the codes used in section *5. Reinforcement learning on for nim*
+3. **data**: contains all the data generated and used in this paper
 
 ### Notes on using our codes:
 * We would recommend running our codes in a Python virtual environment, which can be created by running 
